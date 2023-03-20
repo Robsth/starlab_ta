@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Management</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        /* Custom styles for the hierarchy tree */
+        .tree ul {
+            padding-top: 20px;
+            position: relative;
+            transition: all 0.5s;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .tree li {
+            padding-left: 50px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .tree li::before, .tree li::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        .tree li::before {
+            border-left: 1px solid #ccc;
+            bottom: 50px;
+            height: 100%;
+            width: 1px;
+        }
+
+        .tree li::after {
+            border-top: 1px solid #ccc;
+            height: 20px;
+            top: 25px;
+            width: 25px;
+        }
+
+        .tree li span {
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            display: inline-block;
+            padding: 3px 8px;
+            position: relative;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Employee Management</h1>
+
+        <h2>Employee Hierarchy</h2>
+        <div class="tree">
+            <ul id="employeeTree"></ul>
+        </div>
+
+        <h2>Employee Details</h2>
+        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addEmployeeModal">
+            Add Employee
+        </button>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Full Name</th>
+                    <th>Position</th>
+                    <th>Hire date</th>
+                    <th>Salary</th>
+                    <th>Supervisor ID</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for employee in employees %}
+                <tr>
+                    <td>{{ employee.id }}</td>
+                    <td>{{ employee.full_name }}</td>
+                    <td>{{ employee.position }}</td>
+                    <td>{{ employee.hire_date }}</td>
+                    <td>{{ employee.salary }}</td>
+                    {% if employee.supervisor_id %}
+                        <td>{{ employee.supervisor_id }}</td>
+                    {% else %}
+                        <td>-</td>
+                    {% endif %}
+                    <td>
+                        <button type="button" class="btn btn-warning edit-btn" data-toggle="modal" data-target="#editEmployeeModal"
+                            data-id="{{ employee.id }}" data-full_name="{{ employee.full_name }}" data-position="{{ employee.position }}"
+                            data-hire_date="{{ employee.hire_date }}" data-salary="{{ employee.salary }}" data-supervisor_id="{{ employee.supervisor_id }}">
+                            Edit
+                        </button>
+                        <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#deleteEmployeeModal" data-id="{{ employee.id }}">
+                            Delete
+                        </button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- Add Employee Modal -->
+        <div class="modal fade" id="addEmployeeModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <form method="post" action="employee/create">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Add Employee</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label for="fullName">Full Name</label>
+                                <input type="text" class="form-control" id="fullName" name="full_name" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="position">Position</label>
+                                <input type="text" class="form-control" id="position" name="position" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="hireDate">Date of Employment</label>
+                                <input type="date" class="form-control" id="hireDate" name="hire_date" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="salary">Salary</label>
+                                <input type="number" class="form-control" id="salary" name="salary" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="supervisor">Supervisor ID</label>
+                                <input type="number" class="form-control" id="supervisor" name="supervisor_id">
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Add Employee</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Edit Employee Modal -->
+        <div class="modal fade" id="editEmployeeModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <form method="post" action="employee/edit/{id}">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Edit Employee</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <input type="hidden" name="id" id="editEmployeeId">
+                            <div class="form-group">
+                                <label for="editFullName">Full Name</label>
+                                <input type="text" class="form-control" name="full_name" id="editFullName" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="editPosition">Position</label>
+                                <input type="text" class="form-control" name="position" id="editPosition" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="editHireDate">Date of Employment</label>
+                                <input type="date" class="form-control" name="hire_date" id="editHireDate" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="editSalary">Salary</label>
+                                <input type="number" class="form-control" name="salary" id="editSalary" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="editSupervisorId">Supervisor ID</label>
+                                <input type="number" class="form-control" name="supervisor_id" id="editSupervisorId">
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Save Changes</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Delete Employee Modal -->
+        <div class="modal fade" id="deleteEmployeeModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <form method="post" action="employee/delete/{id}">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Delete Employee</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <input type="hidden" name="employee_id" id="deleteEmployeeId">
+                            <p>Are you sure you want to delete this employee?</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-danger" id="deleteEmployeeButton">Delete Employee</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            const editButtons = $(".edit-btn");
+            const editEmployeeModal = $("#editEmployeeModal");
+
+            editButtons.each(function () {
+                $(this).on("click", function () {
+                    const id = $(this).data("id");
+                    const fullName = $(this).data("full_name");
+                    const position = $(this).data("position");
+                    const hireDate = $(this).data("hire_date");
+                    const salary = $(this).data("salary");
+                    const supervisorId = $(this).data("supervisor_id");
+
+                    $("#editEmployeeId", editEmployeeModal).val(id);
+                    $("#editFullName", editEmployeeModal).val(fullName);
+                    $("#editPosition", editEmployeeModal).val(position);
+                    $("#editHireDate", editEmployeeModal).val(hireDate);
+                    $("#editSalary", editEmployeeModal).val(salary);
+                    $("#editSupervisorId", editEmployeeModal).val(supervisorId || "");
+                });
+            });
+
+            const editEmployeeForm = $("form", editEmployeeModal);
+
+            editEmployeeForm.on("submit", async function (event) {
+                event.preventDefault();
+
+                const formData = new FormData(this);
+                const employeeId = formData.get("id");
+                console.log(formData);
+                console.log(employeeId);
+                const url = `/employee/edit/${employeeId}`;
+                const requestOptions = {
+                    method: "POST",
+                    body: formData,
+                };
+
+                const response = await fetch(url, requestOptions);
+
+                if (response.ok) {
+                    location.reload();
+                } else {
+                    const errorMessage = await response.text();
+                    alert(`Error updating employee: ${errorMessage}`);
+                }
+            });
+        });
+
+    </script>
+    <script>
+        const employees = {{ employees | tojson }};
+        const treeRoot = document.getElementById('employeeTree');
+
+        function buildHierarchyTree(employeeList, supervisorId = null) {
+            const filteredEmployees = employeeList.filter(e => e.supervisor_id === supervisorId);
+            if (filteredEmployees.length === 0) {
+                return null;
+            }
+
+            const ulElement = document.createElement('ul');
+            for (const employee of filteredEmployees) {
+                const liElement = document.createElement('li');
+                const spanElement = document.createElement('span');
+                spanElement.textContent = `${employee.full_name} (${employee.position})`;
+
+                liElement.appendChild(spanElement);
+                const subTree = buildHierarchyTree(employeeList, employee.id);
+                if (subTree) {
+                    liElement.appendChild(subTree);
+                }
+                ulElement.appendChild(liElement);
+            }
+
+            return ulElement;
+        }
+
+        const employeeHierarchyTree = buildHierarchyTree(employees);
+        if (employeeHierarchyTree) {
+            treeRoot.appendChild(employeeHierarchyTree);
+        }
+    </script>
+    <script>
+    /*
+        $('#editEmployeeModal').on('show.bs.modal', function (event) {
+            const button = $(event.relatedTarget);
+            const id = button.data('id');
+            const employee = employees.find(e
+                        const employee = employees.find(e => e.id === id);
+
+            const modal = $(this);
+            modal.find('#editEmployeeId').val(employee.id);
+            modal.find('#editFullName').val(employee.full_name);
+            modal.find('#editPosition').val(employee.position);
+            modal.find('#editHireDate').val(employee.hire_date);
+            modal.find('#editSalary').val(employee.salary);
+            modal.find('#editSupervisorId').val(employee.supervisor_id);
+        });
+    */
+    /*
+        $('#deleteEmployeeModal').on('show.bs.modal', function (event) {
+            const button = $(event.relatedTarget);
+            const id = button.data('id');
+
+            const modal = $(this);
+            modal.find('#deleteEmployeeId').val(id);
+        });
+    */
+    $('#deleteEmployeeModal').on('show.bs.modal', function (event) {
+        const button = $(event.relatedTarget);
+        const id = button.data('id');
+
+        const modal = $(this);
+        modal.find('#deleteEmployeeId').val(id);
+
+        // Set the form's action attribute with the employee ID
+        const formAction = `/employee/delete/${id}`;
+        modal.find('#deleteEmployeeForm').attr('action', formAction);
+    });
+
+
+    </script>
+</body>
+</html>
+
+

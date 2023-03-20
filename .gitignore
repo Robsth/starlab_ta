@@ -1,0 +1,7 @@
+*.pyc
+*.pyo
+*.pyd
+*.pyc~
+*.pyo~
+.pytest_cache/
+.idea
