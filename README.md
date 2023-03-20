@@ -73,13 +73,13 @@ The application consists of several main components:
 The application provides the following API endpoints:
 
 - `GET /employee`: Retrieve a list of all employees.
-- `POST /employee`: Create a new employee. The request body should be a JSON object containing the following fields:
+- `POST /employee/create`: Create a new employee. The request body should be a JSON object containing the following fields:
   - `full_name`: The full name of the employee (required, 3-100 characters).
   - `position`: The position of the employee (required, 2-100 characters).
   - `hire_date`: The date of employment in the format "YYYY-MM-DD" (required).
   - `salary`: The salary of the employee (required, greater than 0).
   - `supervisor_id`: The ID of the employee's supervisor (optional, greater than 0).
-- `POST /employee/{id}`: Update an existing employee by ID. The request body should be a JSON object containing the same fields as for the `POST /employee` endpoint.
-- `POST /employee/{id}`: Delete an employee by ID.
+- `POST /employee/edit/{id}`: Update an existing employee by ID. The request body should be a JSON object containing the same fields as for the `POST /employee` endpoint.
+- `POST /employee/delete/{id}`: Delete an employee by ID.
 
 To interact with the API, you can use tools like [curl](https://curl.se/) or [Postman](https://www.postman.com/), or you can build a frontend application that sends requests to the API.
