@@ -32,14 +32,13 @@ This is a test task for an Employee Management System built with Python, aiohttp
 2. Clone the repository.
 3. In the project folder, run `docker-compose --env-file env/.env up --build`.
 
-The application should now be running at http://0.0.0.0:8080/employee.
+The application should now be running at http://0.0.0.0:8080/.
 
 ### Applying migrations
 
-To apply migrations, execute the following command in the project folder:
+Apply migrations by running the following command in the project folder:
 
 `docker-compose exec app alembic upgrade head`
-
 
 ### Creating test data
 
@@ -47,6 +46,7 @@ To run script that adds list of test employees, execute the following command in
 
 `docker-compose exec app python3 app/scripts/create_test_data.py`
 
+then open http://0.0.0.0:8080/employee in your browser.
 
 ## Documentation
 

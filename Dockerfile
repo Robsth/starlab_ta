@@ -19,11 +19,4 @@ ENV PYTHONPATH=/usr/src/app
 
 LABEL type="starlab"
 
-# RUN chmod +x /usr/src/app/app/scripts/create_test_data.py
-# RUN python3 /usr/src/app/app/scripts/create_test_data.py
-
 CMD ["python", "app/main.py"]
-# docker exec --env-file env/.env 41d72aa4bf99 alembic init -t async app/migrations
-# docker exec --env-file env/.env 41d72aa4bf99 alembic revision --autogenerate -m "init migration"
-# docker exec --env-file env/.env 41d72aa4bf99 alembic upgrade head
-# docker exec -it 333beee0b8a5 psql -U postgres
